@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
 import {
   MessageSquare,
   User,
@@ -9,6 +10,7 @@ import {
   EyeOff,
   Loader2,
 } from "lucide-react";
+import AuthImagePattern from "../components/AuthImagePattern";
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,9 +22,13 @@ function SignUpPage() {
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    if (!formData.name.trim()) return false;
-    if (!formData.email.trim()) return false;
-    if (!formData.password || formData.password.length < 6) return false;
+    if (!formData.name.trim()) return toast.error("Name is required");
+    if (!formData.email.trim()) return toast.error("Email is required");
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      return toast.error("Please enter a valid email address");
+    if (!formData.password.trim()) return toast.error("Password is required");
+    if (formData.password.length < 6)
+      return toast.error("Password must be at least 6 characters long");
     return true;
   };
 
@@ -150,6 +156,11 @@ function SignUpPage() {
           </div>
         </div>
       </div>
+      {/* Placeholder for right side content, e.g., an image or additional info */}
+      <AuthImagePattern
+        title="Join Us Today"
+        subtitle="connect with friends and family and share your moments"
+      />
     </div>
   );
 }
