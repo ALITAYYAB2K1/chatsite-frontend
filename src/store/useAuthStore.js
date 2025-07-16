@@ -19,5 +19,17 @@ export const useAuthStore = create((set) => ({
       set({ isCheckingAuth: false });
     }
   },
-  signup: async (formData) => {},
+  signup: async (formData) => {
+    set({ isSigningUp: true });
+    try {
+      const response = await axiosInstance.post("/signup", formData);
+      set({ user: response.data });
+      console.log("User signed up successfully:", response.data);
+    } catch (error) {
+      console.error("Error signing up:", error);
+      set({ user: null });
+    } finally {
+      set({ isSigningUp: false });
+    }
+  },
 }));
