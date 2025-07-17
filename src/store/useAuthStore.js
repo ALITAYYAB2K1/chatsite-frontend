@@ -91,4 +91,19 @@ export const useAuthStore = create((set) => ({
       set({ isUpdatingProfile: false });
     }
   },
+  deleteAccount: async () => {
+    try {
+      await axiosInstance.delete("/delete");
+      set({ user: null });
+      toast.success("Account deleted successfully!");
+      // Clear any stored authentication data
+      localStorage.removeItem("theme");
+    } catch (error) {
+      console.error("Account deletion error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete account. Please try again."
+      );
+    }
+  },
 }));
