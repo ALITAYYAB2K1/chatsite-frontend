@@ -5,19 +5,25 @@ import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
-import { axiosInstance } from "./lib/axios.js";
 import { useAuthStore } from "./store/useAuthStore.js";
 import { useThemeStore } from "./store/useThemeStore.js";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 const App = () => {
-  const { user, checkAuth, isCheckingAuth } = useAuthStore();
+  const { user, checkAuth, isCheckingAuth, disconnectSocket } = useAuthStore();
   const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Cleanup socket connection when component unmounts
+  useEffect(() => {
+    return () => {
+      disconnectSocket();
+    };
+  }, [disconnectSocket]);
 
   // Apply theme to HTML element whenever theme changes
   useEffect(() => {

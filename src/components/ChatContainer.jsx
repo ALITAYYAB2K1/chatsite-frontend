@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore.js";
 import ChatHeader from "./ChatHeader.jsx";
 import MessageInput from "./MessageInput.jsx";
@@ -13,12 +13,27 @@ function ChatContainer() {
     isMessagesLoading,
     selectedUser,
     deleteMessage,
+    subscribeToMessages,
+    unsubscribeFromMessages,
   } = useChatStore();
   const { user } = useAuthStore();
-
+  const messageEndRef = React.useRef(null);
   useEffect(() => {
     getMessages(selectedUser?._id);
-  }, [selectedUser?._id, getMessages]);
+    subscribeToMessages();
+    return () => {
+      unsubscribeFromMessages();
+    };
+  }, [
+    selectedUser?._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
+  useEffect(() => {
+    if (messageEndRef.current && messages)
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleDeleteMessage = async (messageId) => {
     if (window.confirm("Are you sure you want to delete this message?")) {
@@ -48,6 +63,7 @@ function ChatContainer() {
             <div
               key={message._id}
               className={`chat ${isOwnMessage ? "chat-end" : "chat-start"}`}
+              ref={messageEndRef}
             >
               <div className="chat-image avatar">
                 <div className="size-10 rounded-full border">

@@ -1,19 +1,22 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
+import { socketService } from "../lib/socket.js";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
+  socket: null,
 
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/check");
       set({ user: response.data });
+      get().connectSocket();
     } catch (error) {
       console.error("Error checking authentication:", error);
       set({ user: null });
@@ -28,6 +31,7 @@ export const useAuthStore = create((set) => ({
 
       set({ user: response.data });
       toast.success("Signed up successfully!");
+      get().connectSocket();
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to sign up. Please try again."
@@ -44,6 +48,7 @@ export const useAuthStore = create((set) => ({
       const response = await axiosInstance.post("/login", formData);
       set({ user: response.data });
       toast.success("Logged in successfully!");
+      get().connectSocket(); // Connect socket after login
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to log in. Please try again."
@@ -59,7 +64,9 @@ export const useAuthStore = create((set) => ({
       await axiosInstance.post("/logout");
       set({ user: null });
       toast.success("Logged out successfully!");
+      get().disconnectSocket(); // Disconnect socket on logout
     } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Failed to log out. Please try again.");
     }
   },
@@ -105,5 +112,26 @@ export const useAuthStore = create((set) => ({
           "Failed to delete account. Please try again."
       );
     }
+  },
+  connectSocket: () => {
+    const { user } = get();
+    if (!user || socketService.getSocket()?.connected) return;
+
+    const socket = socketService.connect(user._id);
+    set({ socket: socket });
+
+    // Listen for online users updates
+    socket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+      console.log("Online users updated:", userIds);
+    });
+
+    console.log("Socket connected for user:", user._id);
+  },
+
+  disconnectSocket: () => {
+    socketService.disconnect();
+    set({ socket: null, onlineUsers: [] });
+    console.log("Socket disconnected");
   },
 }));
