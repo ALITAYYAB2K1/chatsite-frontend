@@ -1,0 +1,73 @@
+import { create } from "zustand";
+
+import toast from "react-hot-toast";
+
+import { axiosInstance } from "../lib/axios.js";
+
+export const useChatStore = create((set, get) => ({
+  messages: [],
+  users: [],
+  selectedUser: null,
+  isUsersLoading: false,
+  isMessagesLoading: false,
+
+  getUsers: async () => {
+    set({ isUsersLoading: true });
+    try {
+      const response = await axiosInstance.get("/message/users");
+      set({ users: response.data });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users. Please try again.");
+    } finally {
+      set({ isUsersLoading: false });
+    }
+  },
+  getMessages: async (userId) => {
+    set({ isMessagesLoading: true });
+    try {
+      const response = await axiosInstance.get(`/message/${userId}`);
+      set({ messages: response.data });
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      toast.error("Failed to fetch messages. Please try again.");
+    } finally {
+      set({ isMessagesLoading: false });
+    }
+  },
+  sendMessage: async (messageData) => {
+    const { selectedUser, messages } = get();
+    try {
+      // Create FormData to handle file uploads
+      const formData = new FormData();
+
+      // Add text if provided
+      if (messageData.text) {
+        formData.append("text", messageData.text);
+      }
+
+      // Handle image upload if provided
+      if (messageData.image) {
+        formData.append("image", messageData.image);
+      }
+
+      const response = await axiosInstance.post(
+        `/message/send/${selectedUser._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      set({ messages: [...messages, response.data.data] });
+      toast.success("Message sent successfully!");
+    } catch (error) {
+      toast.error("Failed to send message. Please try again.");
+      console.error("Error sending message:", error);
+    }
+  },
+  setSelectedUser: (selectedUser) => {
+    set({ selectedUser });
+  },
+}));
