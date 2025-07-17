@@ -13,9 +13,13 @@ const Sidebar = () => {
 
   useEffect(() => {
     // Only fetch users if user is authenticated
+    console.log("Sidebar useEffect - user:", user);
+    console.log("Sidebar useEffect - users length:", users.length);
     if (user) {
+      console.log("User is authenticated, fetching users...");
       getUsers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getUsers, user]); // Add user as dependency
 
   const filteredUsers = showOnlineOnly
