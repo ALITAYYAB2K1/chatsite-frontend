@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:8080";
 
 class SocketService {
   constructor() {
