@@ -18,7 +18,12 @@ export const useAuthStore = create((set, get) => ({
       set({ user: response.data });
       get().connectSocket();
     } catch (error) {
-      console.error("Error checking authentication:", error);
+      // 401 is expected when user is not logged in, don't log as error
+      if (error.response?.status === 401) {
+        console.log("User not authenticated (expected)");
+      } else {
+        console.error("Error checking authentication:", error);
+      }
       set({ user: null });
     } finally {
       set({ isCheckingAuth: false });
