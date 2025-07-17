@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore.js";
-import { Image, Send, X } from "lucide-react";
+import { Image, Send, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef(null);
   const { sendMessage } = useChatStore();
 
@@ -38,6 +39,7 @@ const MessageInput = () => {
     e.preventDefault();
     if (!text.trim() && !selectedFile) return;
 
+    setIsSending(true);
     try {
       await sendMessage({
         text: text.trim(),
@@ -51,6 +53,8 @@ const MessageInput = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -105,9 +109,13 @@ const MessageInput = () => {
         <button
           type="submit"
           className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !selectedFile}
+          disabled={(!text.trim() && !selectedFile) || isSending}
         >
-          <Send size={22} />
+          {isSending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Send size={22} />
+          )}
         </button>
       </form>
     </div>
