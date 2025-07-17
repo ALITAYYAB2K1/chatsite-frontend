@@ -65,14 +65,27 @@ export const useAuthStore = create((set) => ({
   updateProfile: async (formData) => {
     set({ isUpdatingProfile: true });
     try {
-      const response = await axiosInstance.put("/profile", formData);
-      set({ user: response.data });
+      const response = await axiosInstance.put("/profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      set({ user: response.data.user });
       toast.success("Profile updated successfully!");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to update profile. Please try again."
-      );
+      console.error("Profile update error:", error);
+
+      // Handle specific error codes
+      if (error.response?.status === 413) {
+        toast.error("Image is too large. Please choose a smaller image.");
+      } else if (error.response?.status === 400) {
+        toast.error(error.response?.data?.message || "Invalid image format.");
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to update profile. Please try again."
+        );
+      }
     } finally {
       set({ isUpdatingProfile: false });
     }
