@@ -8,12 +8,15 @@ const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
     useChatStore();
 
-  const { onlineUsers } = useAuthStore();
+  const { onlineUsers, user } = useAuthStore(); // Add user to get auth state
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    // Only fetch users if user is authenticated
+    if (user) {
+      getUsers();
+    }
+  }, [getUsers, user]); // Add user as dependency
 
   const filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))

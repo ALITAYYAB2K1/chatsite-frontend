@@ -19,7 +19,11 @@ export const useChatStore = create((set, get) => ({
       set({ users: response.data });
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error("Failed to fetch users. Please try again.");
+
+      // Don't show error toast for 401 (unauthorized) - user not logged in
+      if (error.response?.status !== 401) {
+        toast.error("Failed to fetch users. Please try again.");
+      }
     } finally {
       set({ isUsersLoading: false });
     }
