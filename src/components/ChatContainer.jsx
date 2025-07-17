@@ -1,4 +1,4 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore.js";
 import ChatHeader from "./ChatHeader.jsx";
 import MessageInput from "./MessageInput.jsx";
@@ -18,18 +18,18 @@ function ChatContainer() {
   } = useChatStore();
   const { user } = useAuthStore();
   const messageEndRef = React.useRef(null);
+
   useEffect(() => {
-    getMessages(selectedUser?._id);
-    subscribeToMessages();
+    if (selectedUser?._id) {
+      getMessages(selectedUser._id);
+      subscribeToMessages();
+    }
+
     return () => {
       unsubscribeFromMessages();
     };
-  }, [
-    selectedUser?._id,
-    getMessages,
-    subscribeToMessages,
-    unsubscribeFromMessages,
-  ]);
+  }, [selectedUser?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (messageEndRef.current && messages)
       messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -106,6 +106,7 @@ function ChatContainer() {
             </div>
           );
         })}
+        <div ref={messageEndRef} />
       </div>
       <MessageInput />
     </div>
