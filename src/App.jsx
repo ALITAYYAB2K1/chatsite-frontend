@@ -5,6 +5,7 @@ import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import APITest from "./components/APITest.jsx";
 import { useAuthStore } from "./store/useAuthStore.js";
 import { useThemeStore } from "./store/useThemeStore.js";
 import { useEffect } from "react";
@@ -43,6 +44,7 @@ const App = () => {
     <div data-theme={theme}>
       <Navbar />
       <Routes>
+        <Route path="/test" element={<APITest />} />
         <Route
           path="/"
           element={user ? <HomePage /> : <Navigate to="/login" />}

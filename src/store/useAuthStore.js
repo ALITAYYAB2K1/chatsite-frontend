@@ -27,12 +27,20 @@ export const useAuthStore = create((set, get) => ({
   signup: async (formData) => {
     set({ isSigningUp: true });
     try {
+      console.log("Attempting signup with:", formData);
+      console.log("Using API URL:", axiosInstance.defaults.baseURL);
+
       const response = await axiosInstance.post("/signup", formData);
+      console.log("Signup response:", response.data);
 
       set({ user: response.data });
       toast.success("Signed up successfully!");
       get().connectSocket();
     } catch (error) {
+      console.error("Signup error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
       toast.error(
         error.response?.data?.message || "Failed to sign up. Please try again."
       );
@@ -45,11 +53,20 @@ export const useAuthStore = create((set, get) => ({
   login: async (formData) => {
     set({ isLoggingIn: true });
     try {
+      console.log("Attempting login with:", formData);
+      console.log("Using API URL:", axiosInstance.defaults.baseURL);
+
       const response = await axiosInstance.post("/login", formData);
+      console.log("Login response:", response.data);
+
       set({ user: response.data });
       toast.success("Logged in successfully!");
       get().connectSocket(); // Connect socket after login
     } catch (error) {
+      console.error("Login error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
       toast.error(
         error.response?.data?.message || "Failed to log in. Please try again."
       );

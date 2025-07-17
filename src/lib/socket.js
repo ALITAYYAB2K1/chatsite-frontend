@@ -1,6 +1,8 @@
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:8080";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:8080";
+
+console.log("Socket URL:", SOCKET_URL);
 
 class SocketService {
   constructor() {
@@ -10,7 +12,7 @@ class SocketService {
   connect(userId) {
     if (this.socket?.connected) return this.socket;
 
-    this.socket = io(BASE_URL, {
+    this.socket = io(SOCKET_URL, {
       query: {
         userId: userId,
       },
