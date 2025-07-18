@@ -10,9 +10,6 @@ const ProfilePage = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(user?.name || "");
 
-  // Debug: Log user data
-  console.log("ProfilePage - User data:", user);
-
   // Update newName when user data changes
   useEffect(() => {
     setNewName(user?.name || "");

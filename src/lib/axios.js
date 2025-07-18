@@ -10,10 +10,18 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Add request interceptor for debugging
+// Add request interceptor for debugging and token handling
 axiosInstance.interceptors.request.use(
   (config) => {
     console.log("Making request to:", config.baseURL + config.url);
+
+    // Add token to Authorization header if it exists
+    const token = localStorage.getItem("auth-token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log("Added token to request header");
+    }
+
     return config;
   },
   (error) => {

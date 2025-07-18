@@ -15,7 +15,13 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/check");
-      set({ user: response.data });
+      console.log("CheckAuth response:", response.data);
+
+      // Handle both response formats: direct user object or nested user object
+      const userData = response.data.user || response.data;
+      console.log("Extracted user data from checkAuth:", userData);
+
+      set({ user: userData });
       get().connectSocket();
     } catch (error) {
       // 401 is expected when user is not logged in, don't log as error
@@ -38,7 +44,20 @@ export const useAuthStore = create((set, get) => ({
       const response = await axiosInstance.post("/signup", formData);
       console.log("Signup response:", response.data);
 
-      set({ user: response.data });
+      // Extract user and token from response
+      const userData = response.data.user;
+      const token = response.data.token;
+
+      console.log("Extracted user data:", userData);
+      console.log("Extracted token:", token);
+
+      // Store token in localStorage
+      if (token) {
+        localStorage.setItem("auth-token", token);
+        console.log("Token stored in localStorage");
+      }
+
+      set({ user: userData });
       toast.success("Signed up successfully!");
       get().connectSocket();
     } catch (error) {
@@ -64,7 +83,20 @@ export const useAuthStore = create((set, get) => ({
       const response = await axiosInstance.post("/login", formData);
       console.log("Login response:", response.data);
 
-      set({ user: response.data });
+      // Extract user and token from response
+      const userData = response.data.user;
+      const token = response.data.token;
+
+      console.log("Extracted user data:", userData);
+      console.log("Extracted token:", token);
+
+      // Store token in localStorage
+      if (token) {
+        localStorage.setItem("auth-token", token);
+        console.log("Token stored in localStorage");
+      }
+
+      set({ user: userData });
       toast.success("Logged in successfully!");
       get().connectSocket(); // Connect socket after login
     } catch (error) {
@@ -84,6 +116,11 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/logout");
+
+      // Clear token from localStorage
+      localStorage.removeItem("auth-token");
+      console.log("Token removed from localStorage");
+
       set({ user: null });
       toast.success("Logged out successfully!");
       get().disconnectSocket(); // Disconnect socket on logout
