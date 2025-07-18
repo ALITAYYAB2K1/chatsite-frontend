@@ -15,13 +15,23 @@ axiosInstance.interceptors.request.use(
   (config) => {
     console.log("Making request to:", config.baseURL + config.url);
 
-    // Add token to Authorization header if it exists
+    // Add token to both Authorization header and cookie
     const token = localStorage.getItem("auth-token");
     if (token) {
-      // Backend expects token in cookies, so set it as a cookie
-      document.cookie = `token=${token}; path=/; secure; samesite=strict`;
-      console.log("Added token to cookie");
+      // Method 1: Try setting cookie (for backend middleware)
+      document.cookie = `token=${token}; path=/; secure; samesite=none`;
+
+      // Method 2: Also add to Authorization header (backup)
+      config.headers.Authorization = `Bearer ${token}`;
+
+      // Method 3: Add as custom header (if backend can be updated)
+      config.headers["x-token"] = token;
+
+      console.log(
+        "Added token to cookie, Authorization header, and x-token header"
+      );
       console.log("Token preview:", token.substring(0, 50) + "...");
+      console.log("Current document.cookie:", document.cookie);
     } else {
       console.log("No token found in localStorage");
     }
