@@ -14,6 +14,13 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
+      // Check if we have a stored token
+      const storedToken = localStorage.getItem("auth-token");
+      console.log("Stored token exists:", !!storedToken);
+      if (storedToken) {
+        console.log("Token preview:", storedToken.substring(0, 50) + "...");
+      }
+
       const response = await axiosInstance.get("/check");
       console.log("CheckAuth response:", response.data);
 
@@ -27,6 +34,8 @@ export const useAuthStore = create((set, get) => ({
       // 401 is expected when user is not logged in, don't log as error
       if (error.response?.status === 401) {
         console.log("User not authenticated (expected)");
+        // Clear invalid token if checkAuth fails
+        localStorage.removeItem("auth-token");
       } else {
         console.error("Error checking authentication:", error);
       }

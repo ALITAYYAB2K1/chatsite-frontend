@@ -18,8 +18,13 @@ axiosInstance.interceptors.request.use(
     // Add token to Authorization header if it exists
     const token = localStorage.getItem("auth-token");
     if (token) {
+      // Try both common formats
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Added token to request header");
+      config.headers["x-auth-token"] = token;
+      console.log("Added token to request headers (both formats)");
+      console.log("Token preview:", token.substring(0, 50) + "...");
+    } else {
+      console.log("No token found in localStorage");
     }
 
     return config;
