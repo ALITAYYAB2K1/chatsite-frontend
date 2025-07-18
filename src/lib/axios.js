@@ -18,9 +18,9 @@ axiosInstance.interceptors.request.use(
     // Add token to Authorization header if it exists
     const token = localStorage.getItem("auth-token");
     if (token) {
-      // Use only the standard Authorization header (x-auth-token blocked by CORS)
-      config.headers.Authorization = `Bearer ${token}`;
-      console.log("Added token to Authorization header");
+      // Backend expects token in cookies, so set it as a cookie
+      document.cookie = `token=${token}; path=/; secure; samesite=strict`;
+      console.log("Added token to cookie");
       console.log("Token preview:", token.substring(0, 50) + "...");
     } else {
       console.log("No token found in localStorage");
