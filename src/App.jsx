@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import SettingsPage from "./pages/SettingPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import APITest from "./components/APITest.jsx";
+import TokenTest from "./components/TokenTest.jsx";
 import { useAuthStore } from "./store/useAuthStore.js";
 import { useThemeStore } from "./store/useThemeStore.js";
 import { useEffect } from "react";
@@ -45,6 +46,7 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/test" element={<APITest />} />
+        <Route path="/token-test" element={<TokenTest />} />
         <Route
           path="/"
           element={user ? <HomePage /> : <Navigate to="/login" />}
